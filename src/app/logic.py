@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
-import requests
+import aiohttp
 
 
 class RequestToOzon:
+    """Запрос на API Озон"""
     url = "https://api-seller.ozon.ru/"
 
     def __init__(self, api_key, client_id, request_method):
@@ -11,7 +12,8 @@ class RequestToOzon:
         self.service_url = self.url + request_method
 
     @property
-    def headers(self):
+    def headers(self) -> dict:
+        """Заголовок запроса"""
         return {
             "Content-type": "application/json",
             "Api-Key": self.api_key,
@@ -19,7 +21,8 @@ class RequestToOzon:
         }
 
     @property
-    def body(self):
+    def body(self) -> dict:
+        """Тело запроса"""
         return {
             "date": {
                 "from": (datetime.utcnow() - timedelta(days=4)).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
@@ -27,6 +30,13 @@ class RequestToOzon:
             }
         }
 
-    def request_to_ozon(self):
-        responce = requests.post(url=self.service_url, headers=self.headers, json=self.body)
-        return responce.json()
+    async def request_to_ozon(self):
+        """Запрос"""
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                url=self.service_url,
+                headers=self.headers,
+                json=self.body
+            ) as resp:
+                responce = await resp.json()
+        return responce
