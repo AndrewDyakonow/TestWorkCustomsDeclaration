@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     def engine(self):
         """Движок для подключения к БД"""
         uri = f"clickhouse+http://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
-        result = create_engine(url=uri, echo=True)
+        result = create_engine(url=uri, echo=False)
         return result
 
 

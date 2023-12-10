@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from aiohttp.client_exceptions import ContentTypeError
 from src.app.db_utils.utils import insert_or_create_table
 from src.app.logic import RequestToOzon
-# from testes import test_data
+# from testes import test_data                                      # Тестовые данные
 
-app = FastAPI()
+app = FastAPI(title='Customs declarations')
 
 
 @app.post('/')

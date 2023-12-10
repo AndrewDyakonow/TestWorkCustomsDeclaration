@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  db:
+    image:
+      clickhouse/clickhouse-server:latest
+    container_name: db_declarations
+    networks:
+      - myNet
+    ports:
+      - '8123:8123'
+      - '9000:9000'
+    volumes:
+      - ./db_files/clickhouse:/var/lib/clickhouse/
+      - ./db_files/clickhouse-server:/var/log/clickhouse-server/
+    environment:
+      - CLICKHOUSE_DB=my_database
+      - CLICKHOUSE_USER=username
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+      - CLICKHOUSE_PASSWORD=password
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  app:
+    build:
+      context: .
+    container_name: app
+    volumes:
+      - ./:/Customs_declaration_TW/
+    env_file:
+      - .docker.env
+    networks:
+      - myNet
+    ports:
+      - '8000:8000'
+    depends_on:
+      db:
+        condition: service_healthy
+
+networks:
+  myNet:
+    driver: bridge
